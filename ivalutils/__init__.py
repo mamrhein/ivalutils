@@ -23,10 +23,13 @@
 from __future__ import absolute_import
 
 # local imports
-from .interval import (Interval, InvalidInterval, ChainableInterval,
-                       ClosedInterval, LowerClosedInterval, LowerOpenInterval,
-                       OpenBoundedInterval, OpenFiniteInterval,
-                       UpperClosedInterval, UpperOpenInterval,)
+from .interval import (
+    Limit, LowerLimit, LowerInfiniteLimit, UpperLimit, UpperInfiniteLimit,
+    LowerClosedLimit, LowerOpenLimit, UpperClosedLimit, UpperOpenLimit,
+    Interval, InvalidInterval, ChainableInterval, ClosedInterval,
+    LowerClosedInterval, LowerOpenInterval, OpenBoundedInterval,
+    OpenFiniteInterval, UpperClosedInterval, UpperOpenInterval,
+)
 from .interval_chain import IntervalChain
 from .interval_map import IntervalMapping
 
@@ -35,6 +38,15 @@ __version__ = 0, 8, 0
 
 
 __all__ = [
+    'Limit',
+    'LowerLimit',
+    'LowerInfiniteLimit',
+    'UpperLimit',
+    'UpperInfiniteLimit',
+    'LowerClosedLimit',
+    'LowerOpenLimit',
+    'UpperClosedLimit',
+    'UpperOpenLimit',
     'Interval',
     'InvalidInterval',
     'ClosedInterval',
