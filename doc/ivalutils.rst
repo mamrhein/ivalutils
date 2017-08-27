@@ -7,6 +7,10 @@ Interval
 Classes
 =======
 
+.. autoclass:: Limit
+    :members: adjacent_limit, __hash__, __eq__, __lt__, __le__, __gt__,
+        __ge__, __repr__
+
 .. autoclass:: Interval
     :members: lower_limit, upper_limit, limits, is_lower_bounded,
         is_left_bounded, is_upper_bounded, is_right_bounded, is_bounded,
@@ -21,6 +25,14 @@ Classes
 Factoryfunctions
 ================
 
+.. autofunction:: LowerLimit
+.. autofunction:: LowerInfiniteLimit
+.. autofunction:: UpperLimit
+.. autofunction:: UpperInfiniteLimit
+.. autofunction:: LowerClosedLimit
+.. autofunction:: LowerOpenLimit
+.. autofunction:: UpperClosedLimit
+.. autofunction:: UpperOpenLimit
 .. autofunction:: ChainableInterval
 .. autofunction:: ClosedInterval
 .. autofunction:: LowerClosedInterval

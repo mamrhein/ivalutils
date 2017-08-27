@@ -14,7 +14,35 @@
 # $Revision$
 
 
-"""Sequences of adjacent intervals"""
+"""Sequences of adjacent intervals.
+
+Usage
+=====
+
+Creating interval chains
+------------------------
+
+The class :class:`IntervalChain` is used to create sequences of adjacent
+intervals:
+
+    >>> ic = IntervalChain(('a', 'd', 'g', 'z'))
+    >>> ic
+    IntervalChain(('a', 'd', 'g', 'z'))
+
+The default is to create an interval sequence which is lower-bound and
+upper-infinite:
+
+    >>> str(ic)
+    "[['a' .. 'd'), ['d' .. 'g'), ['g' .. 'z'), ['z' .. +inf)]"
+
+By specifying additional parameters, you can specify the lower and / or upper
+endpoint:
+
+    >>> ic = IntervalChain(('a', 'd', 'g', 'z'), add_lower_inf=True, add_upper_inf=False)
+    >>> str(ic)
+    "[(-inf .. 'a'), ['a' .. 'd'), ['d' .. 'g'), ['g' .. 'z')]"
+
+"""
 
 
 #TODO: enhance doc

@@ -14,17 +14,128 @@
 # $Revision$
 
 
-"""Basic interval arithmetic"""
+"""Basic interval arithmetic.
 
+Usage
+=====
 
-#TODO: enhance doc
+Creating intervals
+------------------
+
+The class :class:`Interval` is used to create intervals, i. e. subsets of a
+set of values, by defining a lower and an upper endpoint.
+
+The simplest way is calling :class:`Interval` without arguments, resulting in
+both endpoints to be infinite:
+
+    >>> ival = Interval()
+    >>> ival
+    Interval()
+    >>> str(ival)
+    '(-inf .. +inf)'
+
+For getting a more useful interval, it's neccessary to specify atleast one
+endpoint:
+
+    >>> ival = Interval(LowerClosedLimit(0))
+    >>> ival
+    Interval(lower_limit=Limit(True, 0, True))
+    >>> str(ival)
+    '[0 .. +inf)'
+
+    >>> ival = Interval(upper_limit=UpperClosedLimit(100.))
+    >>> ival
+    Interval(upper_limit=Limit(False, 100.0, True))
+    >>> str(ival)
+    '(-inf .. 100.0]'
+
+    >>> ival = Interval(LowerClosedLimit(0), UpperOpenLimit(27))
+    >>> ival
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 27, False))
+    >>> str(ival)
+    '[0 .. 27)'
+
+Any type which defines a total ordering can be used for the limits:
+
+    >>> ClosedInterval('a', 'zzz')
+    Interval(lower_limit=Limit(True, 'a', True), upper_limit=Limit(False, 'zzz', True))
+
+Several factory functions can be used as shortcut. For example:
+
+    >>> LowerClosedInterval(30)
+    Interval(lower_limit=Limit(True, 30, True))
+    >>> UpperOpenInterval(0)
+    Interval(upper_limit=Limit(False, 0, False))
+    >>> ClosedInterval(1, 3)
+    Interval(lower_limit=Limit(True, 1, True), upper_limit=Limit(False, 3, True))
+    >>> ChainableInterval(0, 5)
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 5, False))
+
+Operations on intervals
+-----------------------
+
+The limits of an interval can be retrieved via properties:
+
+    >>> ival = ClosedInterval(0, 100)
+    >>> ival.lower_limit
+    Limit(True, 0, True)
+    >>> ival.upper_limit
+    Limit(False, 100, True)
+    >>> ival.limits
+    (Limit(True, 0, True), Limit(False, 100, True))
+
+Several methods can be used to test for specifics of an interval. For example:
+
+    >>> ival.is_bounded()
+    True
+    >>> ival.is_finite()
+    True
+    >>> ival.is_left_open()
+    False
+
+Intervals can be tested for including a value:
+
+    >>> 74 in ival
+    True
+    >>> -4 in ival
+    False
+
+Intervals can be compared:
+
+    >>> ival2 = LowerOpenInterval(100)
+    >>> ival3 = LowerClosedInterval(100)
+    >>> ival < ival2
+    True
+    >>> ival < ival3
+    True
+    >>> ival2 < ival3
+    False
+    >>> ival2 == ival3
+    False
+    >>> ival3 < ival2
+    True
+    >>> ival2.is_adjacent(ival3)
+    False
+    >>> ival3.is_adjacent(ival2)
+    False
+    >>> ival4 = UpperClosedInterval(100)
+    >>> ival4.is_adjacent(ival2)
+    True
+    >>> ival.is_overlapping(ival3)
+    True
+    >>> ival.is_subset(ival4)
+    True
+"""
+
 
 # standard library imports
 from collections import Container
-from functools import total_ordering, partial
+from functools import total_ordering
 import operator
 
+
 __metaclass__ = type
+
 
 LOWER_LIMIT_SYMBOLS = ['(', '[']
 UPPER_LIMIT_SYMBOLS = [')', ']']
@@ -180,7 +291,18 @@ class AbstractLimit:
 @total_ordering
 class InfiniteLimit(AbstractLimit):
 
-    """Lower / upper limit of an unbounded (aka infinite) Interval."""
+    """Lower / upper limit of an unbounded (aka infinite) Interval.
+
+    Args:
+        lower (bool): specifies which endpoint of an interval this limit
+            defines: `True` -> lower endpoint, `False` -> upper endpoint
+
+    Returns:
+        instance of :class:`InfiniteLimit`
+
+    Raises:
+        AssertionError: `lower` is not instance of `bool`
+    """
 
     __slots__ = ['_lower']
 
@@ -188,13 +310,6 @@ class InfiniteLimit(AbstractLimit):
     _singletons = {}
 
     def __new__(cls, lower):
-        """Initialize InfiniteLimit instance.
-
-        lower       specifies which endpoint of an interval this limit defines
-                    (must be of type bool):
-                    True:   lower endpoint
-                    False:  upper endpoint
-        """
         assert isinstance(lower, bool)
         try:
             return cls._singletons[lower]
@@ -204,13 +319,6 @@ class InfiniteLimit(AbstractLimit):
             return inf
 
     def __init__(self, lower):
-        """Initialize InfiniteLimit instance.
-
-        lower       specifies which endpoint of an interval this limit defines
-                    (must be of type bool):
-                    True:   lower endpoint
-                    False:  upper endpoint
-        """
         self._lower = lower
 
     @property
@@ -252,33 +360,45 @@ class InfiniteLimit(AbstractLimit):
     def __repr__(self):                                 # pragma: no cover
         return "%sInfiniteLimit()" % ['Upper', 'Lower'][self.is_lower()]
 
+
 # Two factory functions for creating the infinite limits
 
-LowerInfiniteLimit = partial(InfiniteLimit, True)
-UpperInfiniteLimit = partial(InfiniteLimit, False)
+def LowerInfiniteLimit():
+    """Create a lower infinite limit (a singleton)."""
+    return InfiniteLimit(True)
+
+
+def UpperInfiniteLimit():
+    """Create an upper infinite limit (a singleton)."""
+    return InfiniteLimit(False)
 
 
 class Limit(AbstractLimit):
 
-    """Lower / upper limit of an Interval."""
+    """Lower / upper limit of an Interval.
+
+    Args:
+        lower (bool): specifies which endpoint of an interval this limit
+            defines: `True` -> lower endpoint, `False` -> upper endpoint
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+        closed (bool): specifies whether value itself is the endpoint or not:
+            `True` -> the interval that has this limit includes value,
+            `False` -> the interval that has this limit does not includes
+            value
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `lower` is not instance of `bool`
+        AssertionError: `value` is None
+        AssertionError: `closed` is not instance of `bool`
+    """
 
     __slots__ = ['_lower', '_value', '_closed']
 
     def __init__(self, lower, value, closed=True):
-        """Initialize Limit instance.
-
-        lower       specifies which endpoint of an interval this limit defines
-                    (must be of type bool):
-                    True:   lower endpoint
-                    False:  upper endpoint
-        value       limiting value (can be of any type that defines an
-                    ordering)
-        closed      specifies whether value itself is the endpoint or not
-                    (must be of type bool):
-                    True:   the interval that has this limit includes value
-                    False:  the interval that has this limit does not
-                            includes value
-        """
         assert isinstance(lower, bool)
         # prevent undefined limit
         assert value is not None
@@ -350,15 +470,113 @@ class Limit(AbstractLimit):
                                    repr(self.value),
                                    self.is_closed())
 
+
 # Some factory functions for creating limits
 
-LowerLimit = partial(Limit, True)
-UpperLimit = partial(Limit, False)
+def LowerLimit(value, closed=True):
+    """Create a lower limit.
 
-LowerClosedLimit = partial(Limit, True, closed=True)
-LowerOpenLimit = partial(Limit, True, closed=False)
-UpperClosedLimit = partial(Limit, False, closed=True)
-UpperOpenLimit = partial(Limit, False, closed=False)
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+        closed (bool): specifies whether value itself is the endpoint or not:
+            `True` -> the interval that has this limit includes value,
+            `False` -> the interval that has this limit does not includes
+            value
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+        AssertionError: `closed` is not instance of `bool`
+    """
+    return Limit(True, value, closed)
+
+
+def UpperLimit(value, closed=True):
+    """Create an upper limit.
+
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+        closed (bool): specifies whether value itself is the endpoint or not:
+            `True` -> the interval that has this limit includes value,
+            `False` -> the interval that has this limit does not includes
+            value
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+        AssertionError: `closed` is not instance of `bool`
+    """
+    return Limit(False, value, closed)
+
+
+def LowerClosedLimit(value):
+    """Create a lower closed limit.
+
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+    """
+    return Limit(True, value, closed=True)
+
+
+def LowerOpenLimit(value):
+    """Create a lower open limit.
+
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+    """
+    return Limit(True, value, closed=False)
+
+
+def UpperClosedLimit(value):
+    """Create an upper closed limit.
+
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+    """
+    return Limit(False, value, closed=True)
+
+
+def UpperOpenLimit(value):
+    """Create an upper open limit.
+
+    Args:
+        value (<total ordering>): limiting value (can be of any type that
+            defines a total ordering)
+
+    Returns:
+        instance of :class:`Limit`
+
+    Raises:
+        AssertionError: `value` is None
+    """
+    return Limit(False, value, closed=False)
 
 
 # --- Intervals ---
@@ -567,12 +785,12 @@ class Interval(Container):
                 self != other)
 
     def is_disjoint(self, other):
-        """"True if self contains no elements in common with other."""
+        """True if self contains no elements in common with other."""
         return (self.lower_limit > other.upper_limit or
                 self.upper_limit < other.lower_limit)
 
     def is_overlapping(self, other):
-        """"True if there is a common element in self and other."""
+        """True if there is a common element in self and other."""
         return not self.is_disjoint(other)
 
     def is_lower_adjacent(self, other):
