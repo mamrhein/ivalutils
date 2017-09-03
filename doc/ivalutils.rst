@@ -45,6 +45,7 @@ Factoryfunctions
 Exceptions
 ==========
 
+.. autoclass:: IncompatibleLimits
 .. autoclass:: InvalidInterval
 
 *************
