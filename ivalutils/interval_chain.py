@@ -111,6 +111,7 @@ class IntervalChain(Sequence):
         EmptyIntervalChain: given limits do not define any interval
         InvalidInterval: given limits do not define a sequence of adjacent
             intervals
+        IncompatibleLimits: given limits are not comparable
     """
 
     def __init__(self, limits, lower_closed=True, add_lower_inf=False,

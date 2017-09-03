@@ -132,6 +132,7 @@ class IntervalMapping(Mapping, Callable):
         AssertionError: given sequences of limiting values is empty
         InvalidInterval: given limits do not define a sequence of adjacent
             intervals
+        IncompatibleLimits: given limits are not comparable
         TypeError: given sequence is not a sequence of 2-tuples
         TypeError: wrong number of arguments
     """

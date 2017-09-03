@@ -152,6 +152,11 @@ INTERVAL_SYMBOL = '..'
 
 # --- Exceptions ---
 
+class IncompatibleLimits(TypeError):
+
+    """Raised when comparing limits with incompatible types of values."""
+
+
 class InvalidInterval(Exception):
 
     """Raised when an invalid Interval would be created."""
@@ -425,10 +430,13 @@ class Limit(AbstractLimit):
     def _compare(self, other, op):
         if isinstance(other, Limit):
             self_val, other_val = self.value, other.value
-            if self_val == other_val:
-                # if limit values are equal, result depends on limit types
-                return op(self._map_limit_type(), other._map_limit_type())
-            return op(self_val, other_val)
+            try:
+                if self_val == other_val:
+                    # if limit values are equal, result depends on limit types
+                    return op(self._map_limit_type(), other._map_limit_type())
+                return op(self_val, other_val)
+            except TypeError as exc:
+                raise IncompatibleLimits(*exc.args)
         else:
             self_val = self.value
             try:
@@ -623,6 +631,8 @@ class Interval(Container):
         InvalidInterval: `lower_limit` is not a lower limit
         InvalidInterval: `upper_limit` is not a upper limit
         InvalidInterval: `lower_limit` > `upper_limit`
+        IncompatibleLimits: values of `lower_limit` and `upper_limit` are not
+            comparable
     """
 
     def __init__(self, lower_limit=None, upper_limit=None):
