@@ -13,8 +13,10 @@
 
 import unittest
 from copy import copy, deepcopy
+from datetime import date
 from operator import delitem, setitem
-from ivalutils.interval import InvalidInterval, LowerOpenInterval
+from ivalutils.interval import (IncompatibleLimits, InvalidInterval,
+                                LowerOpenInterval)
 from ivalutils.interval_chain import IntervalChain
 from ivalutils.interval_map import IntervalMapping
 
@@ -60,6 +62,11 @@ class IntervalMappingTests(unittest.TestCase):
         self.assertIsInstance(im._keys, IntervalChain)
         self.assertEqual(tuple(im.keys()), tuple(IntervalChain(limits)))
         self.assertEqual(tuple(im.values()), vals)
+        # incompatible limits
+        limits = (0, 27, date.today(), 90)
+        self.assertRaises(IncompatibleLimits, IntervalMapping, limits, vals)
+        self.assertRaises(IncompatibleLimits, IntervalMapping,
+                          list(zip(limits, vals)))
         # check wrong args
         self.assertRaises(TypeError, IntervalMapping)
         self.assertRaises(TypeError, IntervalMapping, 5)

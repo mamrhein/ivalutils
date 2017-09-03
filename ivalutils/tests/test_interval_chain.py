@@ -13,11 +13,13 @@
 
 import unittest
 from copy import copy, deepcopy
+from datetime import date
 from operator import delitem, setitem
-from ivalutils.interval import (Interval, LowerOpenInterval,
-                                LowerInfiniteLimit, UpperInfiniteLimit,
-                                LowerClosedLimit, LowerOpenLimit,
-                                UpperClosedLimit, UpperOpenLimit,)
+from ivalutils.interval import (
+    IncompatibleLimits, Interval, LowerOpenInterval, LowerInfiniteLimit,
+    UpperInfiniteLimit, LowerClosedLimit, LowerOpenLimit, UpperClosedLimit,
+    UpperOpenLimit,
+)
 from ivalutils.interval_chain import IntervalChain, EmptyIntervalChain
 
 
@@ -62,6 +64,9 @@ class IntervalChainTests(unittest.TestCase):
         self.assertRaises(EmptyIntervalChain, IntervalChain, ())
         self.assertRaises(EmptyIntervalChain,
                           IntervalChain, (3,), add_upper_inf=False)
+        # incompatible limits
+        limits = (0, 27, date.today())
+        self.assertRaises(IncompatibleLimits, IntervalChain, limits)
 
     def test_if_immutable(self):
         limits = [0, 10, 50, 300]

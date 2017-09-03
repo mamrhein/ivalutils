@@ -13,15 +13,16 @@
 
 import unittest
 from copy import copy, deepcopy
+from datetime import date
+from operator import ge
 from sys import maxsize
-from ivalutils.interval import (Inf, NegInf, Interval, InvalidInterval,
-                                LowerClosedInterval, UpperClosedInterval,
-                                LowerOpenInterval, UpperOpenInterval,
-                                ClosedInterval, OpenBoundedInterval,
-                                ChainableInterval, Limit, InfiniteLimit,
-                                LowerInfiniteLimit, UpperInfiniteLimit,
-                                LowerClosedLimit, LowerOpenLimit,
-                                UpperClosedLimit, UpperOpenLimit,)
+from ivalutils.interval import (
+    Inf, NegInf, IncompatibleLimits, Limit, InfiniteLimit, LowerInfiniteLimit,
+    UpperInfiniteLimit, LowerLimit, LowerClosedLimit, LowerOpenLimit,
+    UpperLimit, UpperClosedLimit, UpperOpenLimit, InvalidInterval, Interval,
+    LowerClosedInterval, UpperClosedInterval, LowerOpenInterval,
+    UpperOpenInterval, ClosedInterval, OpenBoundedInterval, ChainableInterval,
+)
 
 
 class InfinityTests(unittest.TestCase):
@@ -73,6 +74,40 @@ class LimitTests(unittest.TestCase):
         for val in (lower_inf, maxsize, 'zzz', object()):
             self.assertFalse(val >= upper_inf)
 
+    def test_factory_functions(self):
+        lim = LowerLimit(5)
+        self.assertTrue(lim.is_lower())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_closed())
+        lim = LowerLimit(5, closed=False)
+        self.assertTrue(lim.is_lower())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_open())
+        lim = LowerClosedLimit(5)
+        self.assertTrue(lim.is_lower())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_closed())
+        lim = LowerOpenLimit(5)
+        self.assertTrue(lim.is_lower())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_open())
+        lim = UpperLimit(5)
+        self.assertTrue(lim.is_upper())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_closed())
+        lim = UpperLimit(5, closed=False)
+        self.assertTrue(lim.is_upper())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_open())
+        lim = UpperClosedLimit(5)
+        self.assertTrue(lim.is_upper())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_closed())
+        lim = UpperOpenLimit(5)
+        self.assertTrue(lim.is_upper())
+        self.assertEqual(lim.value, 5)
+        self.assertTrue(lim.is_open())
+
     def test_limit_ops(self):
         lower_closed_limit = LowerClosedLimit(0)
         upper_closed_limit = UpperClosedLimit(0)
@@ -89,13 +124,17 @@ class LimitTests(unittest.TestCase):
                         LowerClosedLimit(5) > LowerOpenLimit(4))
         self.assertTrue(UpperOpenLimit('a') < UpperClosedLimit('b') <
                         LowerClosedLimit('c') < LowerOpenLimit('d'))
+        millenium = date(2000, 1, 1)
+        today = date.today()
+        self.assertTrue(LowerLimit(millenium) < LowerLimit(today))
+        self.assertRaises(IncompatibleLimits, ge, LowerClosedLimit(today),
+                          LowerOpenLimit('d'))
         # compare limits to values
         self.assertTrue(lower_closed_limit == 0)
         self.assertTrue(upper_closed_limit == 0)
         self.assertFalse(lower_closed_limit == '0')
         self.assertFalse(lower_open_limit == 0)
         self.assertFalse(upper_open_limit == 0)
-        #self.assertRaises(TypeError, )
         # two limits are adjacent when they are not equal and there is no
         # value between them
         self.assertEqual(lower_closed_limit.adjacent_limit(),
@@ -149,6 +188,11 @@ class IntervalTests(unittest.TestCase):
         # lower > upper
         upper_limit = UpperOpenLimit(0)
         self.assertRaises(InvalidInterval, Interval, upper_limit, lower_limit)
+        # incompatible limits
+        lower_limit = LowerClosedLimit(0)
+        upper_limit = UpperClosedLimit(date.today())
+        self.assertRaises(IncompatibleLimits, Interval, lower_limit,
+                          upper_limit)
 
     def test_properties(self):
         lower_limit = LowerClosedLimit(0)
