@@ -9,7 +9,7 @@ The base set of values - and therefore the given limits - must have a
 common base type which defines a total order on the values.
 
 Creating intervals
-------------------
+==================
 
 The simplest way is calling the class `Interval` without arguments, resulting
 in both endpoints to be infinite:
@@ -62,7 +62,7 @@ True))
 False))
 
 Operations on intervals
------------------------
+=======================
 
 The limits of an interval can be retrieved via properties:
 
@@ -117,7 +117,7 @@ Intervals can be compared:
     True
 
 Creating sequences of adjacent intervals
-----------------------------------------
+========================================
 
 The class `IntervalChain` is used to create sequences of adjacent intervals:
 
@@ -140,7 +140,7 @@ add_lower_inf=True, add_upper_inf=False)
     "[(-inf .. 'a'], ('a' .. 'd'], ('d' .. 'g'], ('g' .. 'z']]"
 
 Operations on interval chains
------------------------------
+=============================
 
 Interval chains can be indexed and iterated like lists ...:
 
@@ -161,7 +161,7 @@ value:
     1
 
 Creating interval mappings
---------------------------
+==========================
 
 The class `IntervalMapping` is used to create a mapping from intervals to
 arbitrary values.
@@ -184,7 +184,7 @@ value:
     True
 
 Operations on IntervalMappings
-------------------------------
+==============================
 
 Interval mappings behave like ordinary mappings:
 
