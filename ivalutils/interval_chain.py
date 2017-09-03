@@ -30,22 +30,41 @@ intervals:
     IntervalChain(('a', 'd', 'g', 'z'))
 
 The default is to create an interval sequence which is lower-bound and
-upper-infinite:
+upper-infinite and containing lower-closed intervals:
 
     >>> str(ic)
     "[['a' .. 'd'), ['d' .. 'g'), ['g' .. 'z'), ['z' .. +inf)]"
 
-By specifying additional parameters, you can specify the lower and / or upper
-endpoint:
+By specifying additional parameters, you can determine which endpoints will be
+closed and whether a lower and / or upper infinite endpoint will be added:
 
-    >>> ic = IntervalChain(('a', 'd', 'g', 'z'), add_lower_inf=True, add_upper_inf=False)
+    >>> ic = IntervalChain(('a', 'd', 'g', 'z'), lower_closed = False, \
+add_lower_inf=True, add_upper_inf=False)
     >>> str(ic)
-    "[(-inf .. 'a'), ['a' .. 'd'), ['d' .. 'g'), ['g' .. 'z')]"
+    "[(-inf .. 'a'], ('a' .. 'd'], ('d' .. 'g'], ('g' .. 'z']]"
 
+Operations on interval chains
+-----------------------------
+
+Interval chains can be indexed and iterated like lists ...:
+
+    >>> ic[2]
+    Interval(lower_limit=Limit(True, 'd', False), upper_limit=Limit(False, \
+'g', True))
+    >>> [ival.upper_limit.value for ival in ic]
+    ['a', 'd', 'g', 'z']
+
+... and can be searched for the index of the interval holding a specified
+value:
+
+    >>> ic.map2idx('b')
+    1
+    >>> ic.map2idx('a')
+    0
+    >>> ic.map2idx('aa')
+    1
 """
 
-
-#TODO: enhance doc
 
 # standard library imports
 from collections import Sequence
@@ -90,6 +109,8 @@ class IntervalChain(Sequence):
 
     Raises:
         EmptyIntervalChain: given limits do not define any interval
+        InvalidInterval: given limits do not define a sequence of adjacent
+            intervals
     """
 
     def __init__(self, limits, lower_closed=True, add_lower_inf=False,

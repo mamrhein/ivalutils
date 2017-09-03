@@ -59,7 +59,7 @@ Classes
 .. autoclass:: IntervalChain
     :members: limits, total_interval, is_lower_infinite, is_upper_infinite,
         map2idx, __copy__, __eq__, __getitem__, __iter__, __len__, __repr__,
-        __str__, __hash__
+        __str__
 
 Exceptions
 ==========
@@ -76,5 +76,4 @@ Classes
 =======
 
 .. autoclass:: IntervalMapping
-    :members: map, __call__, __copy__, __eq__, __getitem__, __iter__, __len__,
-        __hash__
+    :members: map, __call__, __copy__, __eq__, __getitem__, __iter__, __len__

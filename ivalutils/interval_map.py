@@ -14,10 +14,73 @@
 # $Revision$
 
 
-"""Mappings on intervals"""
+"""Mappings on intervals
 
+Usage
+=====
 
-#TODO: enhance doc
+Creating interval mappings
+--------------------------
+
+The class :class:`IntervalMapping` is used to create a mapping from intervals
+to arbitrary values.
+
+Instances can be created by giving an IntervalChain and a sequence of
+associated values ...:
+
+    >>> im1 = IntervalMapping(IntervalChain((0, 300, 500, 1000)), \
+(0., .10, .15, .20))
+
+... or a sequence of limiting values and a sequence of associated values ...:
+
+    >>> im2 = IntervalMapping((0, 300, 500, 1000), (0., .10, .15, .20))
+
+... or a sequence of tuples, each holding a limiting value and an associated
+value:
+
+    >>> im3 = IntervalMapping(((0, 0.), (300, .10), (500, .15), (1000, .20)))
+    >>> im1 == im2 == im3
+    True
+
+Operations on IntervalMappings
+------------------------------
+
+Interval mappings behave like ordinary mappings:
+
+    >>> list(im3.keys())
+    [Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, \
+300, False)),
+     Interval(lower_limit=Limit(True, 300, True), upper_limit=Limit(False, \
+500, False)),
+     Interval(lower_limit=Limit(True, 500, True), upper_limit=Limit(False, \
+1000, False)),
+     Interval(lower_limit=Limit(True, 1000, True))]
+    >>> list(im3.values())
+    [0.0, 0.1, 0.15, 0.2]
+    >>> im3[Interval(lower_limit=Limit(True, 300, True), upper_limit=\
+Limit(False, 500, False))]
+    0.1
+
+In addition they can be looked-up for the value associated with the interval
+which contains a given value:
+
+    >>> im3.map(583)
+    0.15
+
+As a short-cut, the interval mapping can be used like a function:
+
+    >>> im3(412)
+    0.1
+
+Use cases for interval mappings are for example:
+
+  * determine the discount to be applied depending on an order value,
+  * rating customers depending on their sales turnover,
+  * classifying cities based on the number of inhabitants,
+  * mapping booking dates to accounting periods,
+  * grouping of measured values in discrete ranges.
+"""
+
 
 # standard library imports
 from collections import Mapping, Callable
@@ -38,11 +101,42 @@ class IntervalMapping(Mapping, Callable):
       * a sequence of limiting values and a sequence of associated values,
       * a sequence of tuples, each holding a limiting value and an associated
         value.
+
+    **1. Form**
+
+    Args:
+        arg0 (:class:`IntervalChain`): sequence of intervals to be mapped
+        arg1 (`Sequence`): sequence of associated values
+
+    **2. Form**
+
+    Args:
+        arg0 (`Sequence`): sequence of values limiting the intervals to be
+            mapped
+        arg1 (`Sequence`): sequence of associated values
+
+    **3. Form**
+
+    Args:
+        arg0 (`Sequence`): sequence of tuples containing a limiting value and
+            an associated value
+
+    If no IntervalChain is given, the given limiting values must be comparable
+    and must be given in ascending order.
+
+    Returns:
+        instance of :class:`IntervalMapping`
+
+    Raises:
+        AssertionError: given sequences do not have the same length
+        AssertionError: given sequences of limiting values is empty
+        InvalidInterval: given limits do not define a sequence of adjacent
+            intervals
+        TypeError: given sequence is not a sequence of 2-tuples
+        TypeError: wrong number of arguments
     """
 
     def __init__(self, *args):
-        """Initialize instance of IntervalMapping.
-        """
         nargs = len(args)
         if nargs == 2:
             keys, vals = args
@@ -67,8 +161,7 @@ class IntervalMapping(Mapping, Callable):
         self._vals = tuple(vals)
 
     def map(self, val):
-        """self.map(val) -> result, i.e. the value associated with interval
-        which contains val.
+        """Return the value associated with interval which contains `val`.
         """
         try:
             idx = self._keys.map2idx(val)
@@ -79,8 +172,7 @@ class IntervalMapping(Mapping, Callable):
             return self._vals[idx]
 
     def __call__(self, val):
-        """self(val) -> result, i.e. the value associated with interval
-        which contains val.
+        """Return the value associated with interval which contains `val`.
         """
         return self.map(val)
 

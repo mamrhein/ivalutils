@@ -51,14 +51,16 @@ endpoint:
 
     >>> ival = Interval(LowerClosedLimit(0), UpperOpenLimit(27))
     >>> ival
-    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 27, False))
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 27, \
+False))
     >>> str(ival)
     '[0 .. 27)'
 
 Any type which defines a total ordering can be used for the limits:
 
     >>> ClosedInterval('a', 'zzz')
-    Interval(lower_limit=Limit(True, 'a', True), upper_limit=Limit(False, 'zzz', True))
+    Interval(lower_limit=Limit(True, 'a', True), upper_limit=Limit(False, \
+'zzz', True))
 
 Several factory functions can be used as shortcut. For example:
 
@@ -67,9 +69,11 @@ Several factory functions can be used as shortcut. For example:
     >>> UpperOpenInterval(0)
     Interval(upper_limit=Limit(False, 0, False))
     >>> ClosedInterval(1, 3)
-    Interval(lower_limit=Limit(True, 1, True), upper_limit=Limit(False, 3, True))
+    Interval(lower_limit=Limit(True, 1, True), upper_limit=Limit(False, 3, \
+True))
     >>> ChainableInterval(0, 5)
-    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 5, False))
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 5, \
+False))
 
 Operations on intervals
 -----------------------
