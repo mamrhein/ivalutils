@@ -37,16 +37,14 @@ endpoint:
 
     >>> ival = Interval(LowerClosedLimit(0), UpperOpenLimit(27))
     >>> ival
-    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 27, \
-False))
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 27, False))
     >>> str(ival)
     '[0 .. 27)'
 
 Any type which defines a total ordering can be used for the limits:
 
     >>> ClosedInterval('a', 'zzz')
-    Interval(lower_limit=Limit(True, 'a', True), upper_limit=Limit(False, \
-'zzz', True))
+    Interval(lower_limit=Limit(True, 'a', True), upper_limit=Limit(False, 'zzz', True))
 
 Several factory functions can be used as shortcut. For example:
 
@@ -55,11 +53,9 @@ Several factory functions can be used as shortcut. For example:
     >>> UpperOpenInterval(0)
     Interval(upper_limit=Limit(False, 0, False))
     >>> ClosedInterval(1, 3)
-    Interval(lower_limit=Limit(True, 1, True), upper_limit=Limit(False, 3, \
-True))
+    Interval(lower_limit=Limit(True, 1, True), upper_limit=Limit(False, 3, True))
     >>> ChainableInterval(0, 5)
-    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 5, \
-False))
+    Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 5, False))
 
 Operations on intervals
 =======================
@@ -134,8 +130,7 @@ upper-infinite and containing lower-closed intervals:
 By specifying additional parameters, you can determine which endpoints will be
 closed and whether a lower and / or upper infinite endpoint will be added:
 
-    >>> ic = IntervalChain(('a', 'd', 'g', 'z'), lower_closed = False, \
-add_lower_inf=True, add_upper_inf=False)
+    >>> ic = IntervalChain(('a', 'd', 'g', 'z'), lower_closed = False, add_lower_inf=True, add_upper_inf=False)
     >>> str(ic)
     "[(-inf .. 'a'], ('a' .. 'd'], ('d' .. 'g'], ('g' .. 'z']]"
 
@@ -145,8 +140,7 @@ Operations on interval chains
 Interval chains can be indexed and iterated like lists ...:
 
     >>> ic[2]
-    Interval(lower_limit=Limit(True, 'd', False), upper_limit=Limit(False, \
-'g', True))
+    Interval(lower_limit=Limit(True, 'd', False), upper_limit=Limit(False, 'g', True))
     >>> [ival.upper_limit.value for ival in ic]
     ['a', 'd', 'g', 'z']
 
@@ -169,8 +163,7 @@ arbitrary values.
 Instances can be created by giving an IntervalChain and a sequence of
 associated values ...:
 
-    >>> im1 = IntervalMapping(IntervalChain((0, 300, 500, 1000)), \
-(0., .10, .15, .20))
+    >>> im1 = IntervalMapping(IntervalChain((0, 300, 500, 1000)), (0., .10, .15, .20))
 
 ... or a sequence of limiting values and a sequence of associated values ...:
 
@@ -189,17 +182,13 @@ Operations on IntervalMappings
 Interval mappings behave like ordinary mappings:
 
     >>> list(im3.keys())
-    [Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, \
-300, False)),
-     Interval(lower_limit=Limit(True, 300, True), upper_limit=Limit(False, \
-500, False)),
-     Interval(lower_limit=Limit(True, 500, True), upper_limit=Limit(False, \
-1000, False)),
+    [Interval(lower_limit=Limit(True, 0, True), upper_limit=Limit(False, 300, False)),
+     Interval(lower_limit=Limit(True, 300, True), upper_limit=Limit(False, 500, False)),
+     Interval(lower_limit=Limit(True, 500, True), upper_limit=Limit(False, 1000, False)),
      Interval(lower_limit=Limit(True, 1000, True))]
     >>> list(im3.values())
     [0.0, 0.1, 0.15, 0.2]
-    >>> im3[Interval(lower_limit=Limit(True, 300, True), upper_limit=\
-Limit(False, 500, False))]
+    >>> im3[Interval(lower_limit=Limit(True, 300, True), upper_limit=Limit(False, 500, False))]
     0.1
 
 In addition they can be looked-up for the value associated with the interval
@@ -215,11 +204,10 @@ As a short-cut, the interval mapping can be used like a function:
 
 Use cases for interval mappings are for example:
 
-  * determine the discount to be applied depending on an order value,
-  * rating customers depending on their sales turnover,
-  * classifying cities based on the number of inhabitants,
-  * mapping booking dates to accounting periods,
-  * grouping of measured values in discrete ranges.
+* determine the discount to be applied depending on an order value,
+* rating customers depending on their sales turnover,
+* classifying cities based on the number of inhabitants,
+* mapping booking dates to accounting periods,
+* grouping of measured values in discrete ranges.
 
-For more details see the documentation on GitHub or at
-http://ivalutils.readthedocs.io.
+For more details see the documentation on GitHub or at http://ivalutils.readthedocs.io.
