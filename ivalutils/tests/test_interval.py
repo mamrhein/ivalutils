@@ -14,7 +14,7 @@
 import unittest
 from copy import copy, deepcopy
 from datetime import date
-from operator import ge
+from operator import ge, gt, le, lt, and_, or_, sub
 from sys import maxsize
 from ivalutils.interval import (
     Inf, NegInf, IncompatibleLimits, Limit, InfiniteLimit, LowerInfiniteLimit,
@@ -284,6 +284,7 @@ class IntervalTests(unittest.TestCase):
         lmo = OpenBoundedInterval(-5, 15)
         lma = OpenBoundedInterval(-50, 10)
         lu = UpperClosedInterval(-1000)
+        lim = UpperLimit(100)
         # eq
         self.assertEqual(m, m)
         self.assertEqual(uma, uma)
@@ -298,16 +299,25 @@ class IntervalTests(unittest.TestCase):
         self.assertTrue(m != lmo)
         self.assertTrue(m != lma)
         self.assertTrue(m != lu)
+        self.assertTrue(m != lim)
         # lt
         self.assertTrue(lu < lma < lmo < s2 < m < s3 < s1 < umo < uma < uu)
+        self.assertRaises(TypeError, lt, m, lim)
+        self.assertRaises(TypeError, lt, lim, lu)
         # le
         self.assertTrue(
             lu <= lma <= lmo <= s2 <= m <= s3 <= s1 <= umo <= uma <= uu)
+        self.assertRaises(TypeError, le, m, lim)
+        self.assertRaises(TypeError, le, lim, lu)
         # gt
         self.assertTrue(uu > uma > umo > s1 > s3 > m > s2 > lmo > lma > lu)
+        self.assertRaises(TypeError, gt, m, lim)
+        self.assertRaises(TypeError, gt, lim, lu)
         # ge
         self.assertTrue(
             uu >= uma >= umo >= s1 >= s3 >= m >= s2 >= lmo >= lma >= lu)
+        self.assertRaises(TypeError, ge, m, lim)
+        self.assertRaises(TypeError, ge, lim, lu)
 
     def test_set_ops(self):
         uu = LowerClosedInterval(1000)
@@ -320,6 +330,7 @@ class IntervalTests(unittest.TestCase):
         lmo = OpenBoundedInterval(-5, 15)
         lma = OpenBoundedInterval(-50, 10)
         lu = UpperClosedInterval(-1000)
+        lim = UpperLimit(100)
         # test is_subset
         self.assertTrue(s1.is_subset(m))
         self.assertTrue(s2.is_subset(m))
@@ -350,6 +361,8 @@ class IntervalTests(unittest.TestCase):
         self.assertEqual(m - lma, m)
         self.assertEqual(m - uu, m)
         self.assertEqual(m - lu, m)
+        self.assertRaises(TypeError, sub, m, lim)
+        self.assertRaises(TypeError, sub, lim, lu)
         # test union
         self.assertEqual(m | s1, m)
         self.assertEqual(m | s2, m)
@@ -364,6 +377,8 @@ class IntervalTests(unittest.TestCase):
                                            UpperClosedLimit(20)))
         self.assertRaises(InvalidInterval, Interval.__or__, m, uu)
         self.assertRaises(InvalidInterval, Interval.__or__, m, lu)
+        self.assertRaises(TypeError, or_, m, lim)
+        self.assertRaises(TypeError, or_, lim, lu)
         # test intersection
         self.assertEqual(m & s1, s1)
         self.assertEqual(m & s2, s2)
@@ -376,6 +391,8 @@ class IntervalTests(unittest.TestCase):
         self.assertRaises(InvalidInterval, Interval.__and__, m, lma)
         self.assertRaises(InvalidInterval, Interval.__and__, m, uu)
         self.assertRaises(InvalidInterval, Interval.__and__, m, lu)
+        self.assertRaises(TypeError, and_, m, lim)
+        self.assertRaises(TypeError, and_, lim, lu)
 
     def test_repr(self):
         lower_limit = LowerClosedLimit(0)
@@ -394,5 +411,5 @@ class IntervalTests(unittest.TestCase):
         self.assertEqual(ival, eval(repr(ival)))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                              # pragma: no cover
     unittest.main()

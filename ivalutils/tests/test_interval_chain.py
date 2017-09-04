@@ -141,6 +141,7 @@ class IntervalChainTests(unittest.TestCase):
         self.assertNotEqual(ic1, ic2)
         ic2 = IntervalChain(limits, add_upper_inf=False)
         self.assertNotEqual(ic1, ic2)
+        self.assertNotEqual(ic1, limits)
 
     def test_repr(self):
         limits = (0, 10, 50, 300)
@@ -166,5 +167,5 @@ class IntervalChainTests(unittest.TestCase):
         self.assertEqual(ic, eval(r))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':                              # pragma: no cover
     unittest.main()
