@@ -234,7 +234,7 @@ class AbstractLimit:
     # used to map (is_lower, is_closed) to operator in method is_observed_by
     _ops = ((operator.lt, operator.le), (operator.gt, operator.ge))
 
-    def __init__(self):
+    def __init__(self):                                 # pragma: no cover
         raise NotImplementedError
 
     def is_lower(self):
@@ -276,7 +276,7 @@ class AbstractLimit:
         self.is_upper_adjacent(other)."""
         return self.is_lower_adjacent(other) or self.is_upper_adjacent(other)
 
-    def adjacent_limit(self):
+    def adjacent_limit(self):                           # pragma: no cover
         """Return the limit adjacent to self."""
         raise NotImplementedError
 
